@@ -1,4 +1,6 @@
-flask
-requests
-PyYaml
-pysocks
+后端修改意见：
+1.大的修改前提：舍弃pkl的存储方式，换成sqllite3的方式交互与存储。我主要需要存储的内容为文本信息。
+2.舍弃全部chatgpt这部分的全部内容，包括config.yaml文件的使用。
+3.get_response_from_ChatGPT_API完全砍掉（同上诉需求）
+4.对于交互部分，先制作一个伪后端，对于用户输入的内容回复固定文本，未来会使用其他方法替换这部分。
+5.用户id这部分设计保留，基于登录后的登录信息去获取，以用户名进行单独存储用户交互内容。现有的dp（users.db)里已经存储了一个用户的数据：username	email	password：gc	222@gmail.com	114
