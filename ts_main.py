@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, jsonify
 import re
 import logging
 from logging.handlers import RotatingFileHandler
+import uuid
+from db import init_db, get_chats, get_messages, create_chat, add_message, get_chat
 
 app = Flask(__name__)
 
@@ -58,10 +60,48 @@ def preprocess_text(text):
         return truncated, None
     return cleaned_text, None
 
+# 初始化数据库
+init_db()
+
 @app.route('/', methods=['GET'])
 def index():
     logger.info("访问主页")
     return render_template('index.html')
+
+@app.route('/chats', methods=['GET'])
+def get_all_chats():
+    """获取所有聊天"""
+    try:
+        chats_list = get_chats()
+        return jsonify({"ok": True, "data": chats_list})
+    except Exception as e:
+        logger.error(f"获取聊天列表失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"获取聊天列表失败: {str(e)}"}), 500
+
+@app.route('/chats/<chat_id>/messages', methods=['GET'])
+def get_chat_messages(chat_id):
+    """获取指定聊天的所有消息"""
+    try:
+        messages_list = get_messages(chat_id)
+        return jsonify({"ok": True, "data": messages_list})
+    except Exception as e:
+        logger.error(f"获取聊天消息失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"获取聊天消息失败: {str(e)}"}), 500
+
+@app.route('/chats', methods=['POST'])
+def create_new_chat():
+    """创建新聊天"""
+    try:
+        body = request.json
+        if not body or "name" not in body:
+            return jsonify({"ok": False, "errors": "缺少聊天名称"}), 400
+        
+        chat_id = f"chat-{uuid.uuid4().hex[:8]}"
+        chat = create_chat(chat_id, body["name"])
+        return jsonify({"ok": True, "data": chat})
+    except Exception as e:
+        logger.error(f"创建聊天失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"创建聊天失败: {str(e)}"}), 500
 
 @app.route('/abstract', methods=['POST'])
 def abstract_proxy():
@@ -71,10 +111,24 @@ def abstract_proxy():
         if not body or "text" not in body:
             logger.warning("请求格式错误：缺少 text 字段")
             return jsonify({"ok": False, "errors": "请输入文本"}), 400
+            
+        # 获取聊天ID，如果没有则使用默认ID
+        chat_id = body.get("chat_id", "default")
+        
+        # 检查聊天是否存在，如果不存在则创建
+        chat = get_chat(chat_id)
+        if not chat:
+            chat = create_chat(chat_id, "默认任务")
+            
+        # 保存用户消息到数据库
+        add_message(chat_id, "user", body["text"])
+        
         processed_text, error = preprocess_text(body["text"])
         if error:
             logger.info(f"文本预处理失败: {error}")
-            return jsonify({"ok": False, "errors": error}), 400
+            error_message = add_message(chat_id, "assistant", error)
+            return jsonify({"ok": False, "errors": error, "message_id": error_message["id"]}), 400
+            
         payload = {"text": processed_text}
         logger.info(f"发送到 Docker 的 payload: {payload}")
         response = requests.post(
@@ -86,9 +140,19 @@ def abstract_proxy():
         response.raise_for_status()
         result = response.json()
         logger.info(f"Docker 返回结果: {result}")
+        
         if result.get("ok", False) and "data" in result:
             result["data"] = re.sub(r'\s*\[UNK\]\s*', ' ', result["data"]).strip()
             logger.info(f"清理 [UNK] 后结果: {result['data']}")
+            # 保存AI回复到数据库
+            message = add_message(chat_id, "assistant", result["data"])
+            result["message_id"] = message["id"]
+        else:
+            # 保存错误信息到数据库
+            error_msg = result.get("errors", "未知错误")
+            message = add_message(chat_id, "assistant", f"错误: {error_msg}")
+            result["message_id"] = message["id"]
+            
         return jsonify(result)
     except requests.exceptions.RequestException as e:
         logger.error(f"Docker 请求失败: {str(e)}")

@@ -92,7 +92,7 @@ body {
     background: var(--primary-light);
 }
 
-.chat, .newchat {
+.chat, .newchat, .chat-item {
     padding: 12px 15px;
     margin: 5px 10px;
     border-radius: var(--border-radius);
@@ -115,12 +115,12 @@ body {
     box-shadow: 0 4px 8px var(--shadow-color);
 }
 
-.chat {
+.chat, .chat-item {
     background-color: var(--bg-light);
     border: 1px solid var(--border-color);
 }
 
-.chat:hover {
+.chat:hover, .chat-item:hover {
     background-color: var(--bg-dark);
     transform: translateY(-2px);
 }
@@ -282,13 +282,24 @@ body {
 }
 
 .item.item-center span {
-    font-size: 13px;
-    padding: 5px 10px;
+    font-size: 12px;
+    padding: 4px 12px;
     color: var(--text-light);
     background-color: var(--bg-light);
     border-radius: 15px;
     box-shadow: 0 1px 3px var(--shadow-color);
     user-select: none;
+    margin: 5px 0;
+    display: inline-block;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    transition: all var(--transition-speed) ease;
+}
+
+.item.item-center span:hover {
+    background-color: var(--bg-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-color);
 }
 
 /* 输入区域 */

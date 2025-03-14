@@ -1,34 +1,130 @@
 let currentChatId = "default";
-let chats = { "default": { name: "默认任务", messages: [] } };
+let chats = {};
 
 // 加载任务列表
 function loadChats() {
-    $(".chat-list").empty();
-    $(".chat-list").append('<div class="newchat" id="newchat">新建摘要任务</div>');
-    for (let chatId in chats) {
-        let chat = chats[chatId];
-        let selected = chatId === currentChatId ? " selected" : "";
-        let html = `<div class="chat-item${selected}" data-id="${chatId}">${chat.name}</div>`;
-        $(".chat-list").append(html);
-    }
+    // 从服务器获取聊天列表
+    $.ajax({
+        url: "/chats",
+        method: "GET",
+        success: function(response) {
+            if (response.ok && response.data) {
+                // 清空现有列表
+                $(".chat-list").empty();
+                $(".chat-list").append('<div class="newchat" id="newchat">新建摘要任务</div>');
+                
+                // 如果没有聊天，创建默认聊天
+                if (response.data.length === 0) {
+                    chats = { "default": { name: "默认任务", messages: [] } };
+                    // 创建默认聊天到服务器
+                    $.ajax({
+                        url: "/chats",
+                        method: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ name: "默认任务" }),
+                        success: function(resp) {
+                            if (resp.ok && resp.data) {
+                                currentChatId = resp.data.chat_id;
+                            }
+                        }
+                    });
+                } else {
+                    // 更新本地聊天列表
+                    chats = {};
+                    response.data.forEach(chat => {
+                        chats[chat.chat_id] = { name: chat.name, messages: [] };
+                    });
+                    
+                    // 如果当前聊天ID不在列表中，设置为第一个聊天
+                    if (!chats[currentChatId] && response.data.length > 0) {
+                        currentChatId = response.data[0].chat_id;
+                    }
+                }
+                
+                // 渲染聊天列表
+                for (let chatId in chats) {
+                    let chat = chats[chatId];
+                    let selected = chatId === currentChatId ? " selected" : "";
+                    let html = `<div class="chat-item${selected}" data-id="${chatId}">${chat.name}</div>`;
+                    $(".chat-list").append(html);
+                }
+                
+                // 选择当前聊天
+                selectChat(currentChatId);
+            }
+        },
+        error: function() {
+            console.error("获取聊天列表失败");
+            // 使用默认聊天
+            chats = { "default": { name: "默认任务", messages: [] } };
+            $(".chat-list").empty();
+            $(".chat-list").append('<div class="newchat" id="newchat">新建摘要任务</div>');
+            let html = `<div class="chat-item selected" data-id="default">默认任务</div>`;
+            $(".chat-list").append(html);
+        }
+    });
 }
 
 // 切换任务
 function selectChat(chatId) {
     if (!chats[chatId]) return;
     currentChatId = chatId;
-    loadChats();
+    
+    // 更新UI
+    $(".chat-list .chat-item").removeClass("selected");
+    $(`.chat-list .chat-item[data-id="${chatId}"]`).addClass("selected");
     $(".head-chat-name").text(chats[chatId].name);
-    $(".head-chat-info").text(`共${chats[chatId].messages.length}条记录`);
     $(".content").empty();
-    chats[chatId].messages.forEach(appendMessage);
+    
+    // 从服务器获取聊天消息
+    $.ajax({
+        url: `/chats/${chatId}/messages`,
+        method: "GET",
+        success: function(response) {
+            if (response.ok && response.data) {
+                chats[chatId].messages = response.data;
+                $(".head-chat-info").text(`共${chats[chatId].messages.length}条记录`);
+                
+                // 显示消息
+                chats[chatId].messages.forEach(msg => {
+                    let messageObj = {
+                        role: msg.role,
+                        content: msg.content,
+                        send_time: msg.timestamp,
+                        display_time: true
+                    };
+                    appendMessage(messageObj);
+                });
+            }
+        },
+        error: function() {
+            console.error("获取聊天消息失败");
+            $(".head-chat-info").text("获取消息失败");
+        }
+    });
 }
 
 // 创建新任务
 function newChat(name) {
-    let chatId = "chat-" + Date.now();
-    chats[chatId] = { name: name, messages: [] };
-    selectChat(chatId);
+    // 创建新聊天到服务器
+    $.ajax({
+        url: "/chats",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ name: name }),
+        success: function(response) {
+            if (response.ok && response.data) {
+                let chatId = response.data.chat_id;
+                chats[chatId] = { name: name, messages: [] };
+                selectChat(chatId);
+                // 重新加载聊天列表
+                loadChats();
+            }
+        },
+        error: function() {
+            console.error("创建新聊天失败")
+        }
+    });
 }
 
 // 发送消息并获取摘要
@@ -78,7 +174,16 @@ function appendMessage(message) {
             <div class="${bubbleClass}">${content}</div>
         </div>`;
     if (message.display_time) {
-        html = `<div class="item item-center"><span>[${message.send_time}]</span></div>` + html;
+        // 格式化时间显示
+        let formattedTime = message.send_time;
+        if (typeof get_time_str === 'function' && message.send_time) {
+            try {
+                formattedTime = get_time_str(new Date(message.send_time));
+            } catch (e) {
+                console.log("时间格式化失败", e);
+            }
+        }
+        html = `<div class="item item-center"><span>${formattedTime}</span></div>` + html;
     }
     $(".content").append(html);
     hljs.highlightAll();

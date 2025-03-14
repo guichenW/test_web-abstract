@@ -8,8 +8,8 @@ $(document).ready(function () {
         sendMessage();
     });
 
-    // 新建任务
-    $("#newchat").click(function () {
+    // 新建任务 - 使用事件委托绑定到父元素
+    $(".chat-list").on("click", "#newchat", function () {
         let name = prompt("请输入任务名称", "新任务");
         if (name) newChat(name);
     });
