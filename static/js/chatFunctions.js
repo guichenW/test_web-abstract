@@ -127,6 +127,65 @@ function newChat(name) {
     });
 }
 
+// 修改任务名称
+function updateChatName(chatId, newName) {
+    // 更新聊天名称到服务器
+    $.ajax({
+        url: `/chats/${chatId}`,
+        method: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify({ name: newName }),
+        success: function(response) {
+            if (response.ok && response.data) {
+                chats[chatId].name = newName;
+                // 更新UI
+                $(`.chat-list .chat-item[data-id="${chatId}"]`).text(newName);
+                if (currentChatId === chatId) {
+                    $(".head-chat-name").text(newName);
+                }
+            }
+        },
+        error: function() {
+            console.error("更新聊天名称失败");
+            alert("更新任务名称失败");
+        }
+    });
+}
+
+// 删除任务
+function deleteChat(chatId) {
+    if (!confirm("确定要删除这个任务吗？所有相关的消息也将被删除。")) {
+        return;
+    }
+    
+    // 删除聊天到服务器
+    $.ajax({
+        url: `/chats/${chatId}`,
+        method: "DELETE",
+        success: function(response) {
+            if (response.ok) {
+                delete chats[chatId];
+                // 如果删除的是当前聊天，则选择第一个聊天或创建新聊天
+                if (currentChatId === chatId) {
+                    let chatIds = Object.keys(chats);
+                    if (chatIds.length > 0) {
+                        selectChat(chatIds[0]);
+                    } else {
+                        // 如果没有聊天了，创建一个默认聊天
+                        newChat("默认任务");
+                    }
+                }
+                // 重新加载聊天列表
+                loadChats();
+            }
+        },
+        error: function() {
+            console.error("删除聊天失败");
+            alert("删除任务失败");
+        }
+    });
+}
+
 // 发送消息并获取摘要
 function sendMessage() {
     var message = $("#textarea").val().trim();

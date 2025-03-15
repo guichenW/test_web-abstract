@@ -4,7 +4,7 @@ import re
 import logging
 from logging.handlers import RotatingFileHandler
 import uuid
-from db import init_db, get_chats, get_messages, create_chat, add_message, get_chat
+from db import init_db, get_chats, get_messages, create_chat, add_message, get_chat, update_chat_name, delete_chat
 
 app = Flask(__name__)
 
@@ -102,6 +102,30 @@ def create_new_chat():
     except Exception as e:
         logger.error(f"创建聊天失败: {str(e)}")
         return jsonify({"ok": False, "errors": f"创建聊天失败: {str(e)}"}), 500
+
+@app.route('/chats/<chat_id>', methods=['PUT'])
+def update_chat(chat_id):
+    """更新聊天名称"""
+    try:
+        body = request.json
+        if not body or "name" not in body:
+            return jsonify({"ok": False, "errors": "缺少聊天名称"}), 400
+        
+        chat = update_chat_name(chat_id, body["name"])
+        return jsonify({"ok": True, "data": chat})
+    except Exception as e:
+        logger.error(f"更新聊天名称失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"更新聊天名称失败: {str(e)}"}), 500
+
+@app.route('/chats/<chat_id>', methods=['DELETE'])
+def remove_chat(chat_id):
+    """删除聊天"""
+    try:
+        result = delete_chat(chat_id)
+        return jsonify({"ok": True, "data": result})
+    except Exception as e:
+        logger.error(f"删除聊天失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"删除聊天失败: {str(e)}"}), 500
 
 @app.route('/abstract', methods=['POST'])
 def abstract_proxy():

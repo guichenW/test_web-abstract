@@ -20,6 +20,19 @@ $(document).ready(function () {
         selectChat(chatId);
     });
 
+    // 修改任务名称
+    $("#edit-btn").click(function () {
+        let newName = prompt("请输入新的任务名称", chats[currentChatId].name);
+        if (newName && newName !== chats[currentChatId].name) {
+            updateChatName(currentChatId, newName);
+        }
+    });
+
+    // 删除任务
+    $("#delete-btn").click(function () {
+        deleteChat(currentChatId);
+    });
+
     // Enter 键发送
     $("#textarea").keypress(function (e) {
         if (e.which == 13 && !e.shiftKey) {
