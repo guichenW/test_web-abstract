@@ -1,0 +1,725 @@
+/* 现代化UI样式 - 文本摘要工具 */
+:root {
+    --primary-color: #4a6fa5;
+    --primary-light: #6b8cb8;
+    --primary-dark: #345888;
+    --secondary-color: #5cb85c;
+    --secondary-light: #7cc67c;
+    --secondary-dark: #449d44;
+    --text-color: #333333;
+    --text-light: #666666;
+    --bg-color: #f8f9fa;
+    --bg-light: #ffffff;
+    --bg-dark: #e9ecef;
+    --border-color: #dee2e6;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.all-container {
+    height: 90vh;
+    width: 90vw;
+    min-height: 500px;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    transition: all var(--transition-speed) ease;
+}
+
+/* 左侧任务列表容器 */
+.left-container {
+    height: inherit;
+    width: 240px;
+    min-width: 200px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+.chat-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 10px 0;
+}
+
+.chat-list .selected {
+    background-color: var(--primary-light);
+    color: white;
+}
+
+.chat-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+    background: var(--bg-light);
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.chat-list:hover::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+}
+
+.chat, .newchat, .chat-item {
+    padding: 12px 15px;
+    margin: 5px 10px;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+}
+
+.newchat {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.newchat:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.chat, .chat-item {
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-color);
+}
+
+.chat:hover, .chat-item:hover {
+    background-color: var(--bg-dark);
+    transform: translateY(-2px);
+}
+
+/* 右侧内容容器 */
+.right-container {
+    height: inherit;
+    width: calc(90vw - 280px);
+    min-width: 300px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-light);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+/* 头部区域 */
+.head-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.head-right {
+    display: flex;
+    gap: 10px;
+}
+
+.head-btn {
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all var(--transition-speed);
+}
+
+.head-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.head-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: transform var(--transition-speed) ease;
+}
+
+.avatar img:hover {
+    transform: scale(1.1);
+}
+
+.head-info {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin-left: 15px;
+}
+
+.head-chat-name {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.head-chat-info {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 内容区域 */
+.content {
+    position: relative;
+    font-size: 16px;
+    width: 100%;
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    background-color: var(--bg-color);
+}
+
+.content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 10px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.content:hover::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+}
+
+/* 消息气泡 */
+.bubble {
+    max-width: 80%;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    position: relative;
+    color: var(--text-color);
+    word-wrap: break-word;
+    word-break: normal;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    line-height: 1.5;
+}
+
+.item-left .bubble {
+    margin-left: 15px;
+    background-color: var(--bg-light);
+    border-top-left-radius: 0;
+}
+
+.item-left .bubble:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-right: 12px solid var(--bg-light);
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    left: -12px;
+    top: 15px;
+}
+
+.item-right .bubble {
+    margin-right: 15px;
+    background-color: var(--primary-light);
+    color: white;
+    border-top-right-radius: 0;
+}
+
+.item-right .bubble:before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 12px solid var(--primary-light);
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    right: -12px;
+    top: 15px;
+}
+
+.item {
+    margin-top: 20px;
+    display: flex;
+    width: 100%;
+}
+
+.item.item-right {
+    justify-content: flex-end;
+}
+
+.item.item-center {
+    justify-content: center;
+}
+
+.item.item-center span {
+    font-size: 12px;
+    padding: 4px 12px;
+    color: var(--text-light);
+    background-color: var(--bg-light);
+    border-radius: 15px;
+    box-shadow: 0 1px 3px var(--shadow-color);
+    user-select: none;
+    margin: 5px 0;
+    display: inline-block;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    transition: all var(--transition-speed) ease;
+}
+
+.item.item-center span:hover {
+    background-color: var(--bg-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* 输入区域 */
+.input-area {
+    border-top: 1px solid var(--border-color);
+    height: 160px;
+    display: flex;
+    flex-flow: column;
+    background-color: var(--bg-light);
+    padding: 10px;
+}
+
+textarea {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: text;
+    overflow-y: auto;
+    overflow-x: hidden;
+    outline: none;
+    resize: none;
+    transition: border var(--transition-speed) ease;
+    font-family: inherit;
+}
+
+textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+.button-area {
+    display: flex;
+    min-height: 50px;
+    margin-top: 10px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.button-area button {
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    transition: all var(--transition-speed) ease;
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.button-area button:hover {
+    background-color: var(--secondary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.button-area button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* 菜单 */
+.menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0;
+    display: none;
+    z-index: 100;
+}
+
+.menu button {
+    width: 70px;
+    height: 30px;
+    padding: 5px;
+    font-size: 14px;
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.menu button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Markdown 样式 */
+.markdown ol, .markdown ul {
+    padding-left: 1.5em;
+    margin: 1em 0;
+}
+
+.markdown ol {
+    list-style-type: decimal;
+}
+
+.markdown ul {
+    list-style-type: disc;
+}
+
+.markdown pre {
+    padding: 1em;
+    overflow: auto;
+    background-color: #2b2b2b;
+    border-radius: var(--border-radius);
+    margin: 1em 0;
+}
+
+.markdown pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #f8f8f2;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.markdown code {
+    color: #d63384;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 0.2em 0.4em;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.markdown p {
+    margin-bottom: 1em;
+    line-height: 1.6;
+}
+
+.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text-color);
+}
+
+.markdown h1 {
+    font-size: 2em;
+}
+
+.markdown h2 {
+    font-size: 1.5em;
+}
+
+.markdown h3 {
+    font-size: 1.25em;
+}
+
+/* 响应式设计 */
+@media (max-width: 992px) {
+    .all-container {
+        width: 95vw;
+        gap: 10px;
+    }
+    
+    .left-container {
+        width: 200px;
+    }
+    
+    .right-container {
+        width: calc(95vw - 220px);
+    }
+    
+    .head-chat-name {
+        font-size: 20px;
+    }
+    
+    .head-btn {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .all-container {
+        flex-direction: column;
+        height: 95vh;
+        position: relative;
+    }
+    
+    .left-container {
+        width: 95vw;
+        height: auto;
+        max-height: 200px;
+        order: 0;
+    }
+    
+    .right-container {
+        width: 95vw;
+        height: calc(95vh - 220px);
+        order: 1;
+    }
+    
+    .content {
+        font-size: 14px;
+        padding: 15px 10px;
+    }
+    
+    .bubble {
+        max-width: 90%;
+        padding: 12px;
+    }
+    
+    .head-area {
+        padding: 10px 15px;
+    }
+    
+    .avatar img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .head-chat-name {
+        font-size: 18px;
+    }
+    
+    .head-chat-info {
+        font-size: 12px;
+    }
+    
+    .head-btn {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+    
+    .input-area {
+        height: 140px;
+    }
+    
+    textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    .button-area button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .chat, .newchat, .chat-item {
+        padding: 10px 12px;
+        margin: 4px 8px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .all-container {
+        width: 100vw;
+        height: 100vh;
+        gap: 5px;
+        padding-top: 5px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .left-container {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 66.67vw;
+        height: 100vh;
+        max-height: none;
+        margin-bottom: 0;
+        z-index: 1000;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .left-container.active {
+        left: 0;
+    }
+    
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .overlay.active {
+        display: block;
+        opacity: 1;
+    }
+    
+    .right-container {
+        width: 100vw;
+        height: calc(100vh - 190px);
+    }
+    
+    .head-right {
+        gap: 5px;
+    }
+    
+    .head-btn {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    
+    .avatar img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .head-info {
+        margin-left: 10px;
+    }
+    
+    .head-chat-name {
+        font-size: 16px;
+    }
+    
+    .content {
+        padding: 10px 8px;
+    }
+    
+    .bubble {
+        max-width: 95%;
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .input-area {
+        height: 120px;
+        padding: 8px;
+    }
+    
+    textarea {
+        font-size: 13px;
+        padding: 8px;
+    }
+    
+    .button-area {
+        min-height: 40px;
+        margin-top: 8px;
+    }
+    
+    .button-area button {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-up {
+    animation: slideUp 0.5s ease forwards;
+}
+
+/* 触摸设备优化 */
+.touch-active {
+    opacity: 0.7;
+    transform: scale(0.97);
+}
+
+/* 确保在触摸设备上有足够大的点击区域 */
+@media (max-width: 768px) {
+    .button-area button,
+    .head-btn,
+    .chat-item,
+    .newchat {
+        min-height: 44px;
+    }
+    
+    /* 优化移动端滚动体验 */
+    .content,
+    .chat-list {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 防止iOS上的输入框缩放 */
+    textarea,
+    input {
+        font-size: 16px;
+    }
+}

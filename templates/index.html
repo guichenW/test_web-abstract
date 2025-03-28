@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no">
+    <title>文本摘要调试工具</title>
+    <link rel="shortcut icon" href="/static/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/modern.css">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/a11y-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="all-container">
+        <div class="left-container">
+            <div class="chat-list">
+                <div class="newchat" id="newchat">新建摘要任务</div>
+                <!-- 动态加载的任务列表 -->
+            </div>
+        </div>
+        <div class="right-container">
+            <div class="head-area">
+                <div class="head-left">
+                    <div class="avatar">
+                        <img src="/static/chatgpt.png" alt="">
+                    </div>
+                    <div class="head-info">
+                        <div class="head-chat-name">默认任务</div>
+                        <div class="head-chat-info">共0条记录</div>
+                    </div>
+                </div>
+                <div class="head-right">
+                    <button id="edit-btn" class="head-btn">修改名称</button>
+                    <button id="delete-btn" class="head-btn">删除任务</button>
+                </div>
+            </div>
+            <div class="content"></div>
+            <div class="input-area">
+                <textarea name="text" id="textarea" placeholder="请输入长文本以生成摘要..."></textarea>
+                <div class="button-area">
+                    <button id="send-btn" class="talk_sub">生成摘要</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="menu" id="menu">
+        <button class="menu-btn" id="copy-btn">复制</button>
+    </div>
+</body>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/chatFunctions.js"></script>
+<script src="/static/js/clickEventHandler.js"></script>
+<script src="/static/js/modernUI.js"></script>
+</html>
