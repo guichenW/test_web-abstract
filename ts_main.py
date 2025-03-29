@@ -88,6 +88,26 @@ def get_chat_messages(chat_id):
         logger.error(f"获取聊天消息失败: {str(e)}")
         return jsonify({"ok": False, "errors": f"获取聊天消息失败: {str(e)}"}), 500
 
+@app.route('/chats/<chat_id>/messages', methods=['POST'])
+def add_chat_message(chat_id):
+    """添加新消息到指定聊天"""
+    try:
+        body = request.json
+        if not body or "role" not in body or "content" not in body:
+            return jsonify({"ok": False, "errors": "缺少消息角色或内容"}), 400
+        
+        # 检查聊天是否存在
+        chat = get_chat(chat_id)
+        if not chat:
+            return jsonify({"ok": False, "errors": "聊天不存在"}), 404
+            
+        # 添加消息
+        message = add_message(chat_id, body["role"], body["content"])
+        return jsonify({"ok": True, "data": message})
+    except Exception as e:
+        logger.error(f"添加聊天消息失败: {str(e)}")
+        return jsonify({"ok": False, "errors": f"添加聊天消息失败: {str(e)}"}), 500
+
 @app.route('/chats', methods=['POST'])
 def create_new_chat():
     """创建新聊天"""

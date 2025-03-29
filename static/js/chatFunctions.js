@@ -15,19 +15,9 @@ function loadChats() {
                 
                 // 如果没有聊天，创建默认聊天
                 if (response.data.length === 0) {
-                    chats = { "default": { name: "默认任务", messages: [] } };
-                    // 创建默认聊天到服务器
-                    $.ajax({
-                        url: "/chats",
-                        method: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({ name: "默认任务" }),
-                        success: function(resp) {
-                            if (resp.ok && resp.data) {
-                                currentChatId = resp.data.chat_id;
-                            }
-                        }
-                    });
+                    // 使用newChat函数创建默认聊天，这样会显示欢迎消息
+                    newChat("默认任务");
+                    return; // 创建后会重新加载聊天列表，所以这里直接返回
                 } else {
                     // 更新本地聊天列表
                     chats = {};
@@ -117,6 +107,68 @@ function newChat(name) {
                 let chatId = response.data.chat_id;
                 chats[chatId] = { name: name, messages: [] };
                 selectChat(chatId);
+                
+                // 根据当前时间发送欢迎消息
+                let now = new Date();
+                let hour = now.getHours();
+                let greeting = "";
+                
+                if (hour >= 5 && hour < 12) {
+                    greeting = "上午好";
+                } else if (hour >= 12 && hour < 18) {
+                    greeting = "下午好";
+                } else {
+                    greeting = "晚上好";
+                }
+                
+                let welcomeMessage = `${greeting}，我是新闻文本摘要模型，请输入一段新闻文本以生成摘要`;
+                let messageObj = {
+                    role: "assistant",
+                    content: welcomeMessage,
+                    send_time: new Date().toLocaleString(),
+                    display_time: true
+                };
+                
+                // 添加欢迎消息到UI
+                appendMessage(messageObj);
+                
+                // 保存欢迎消息到服务器
+                let retryCount = 0;
+                const maxRetries = 3;
+                
+                function saveWelcomeMessage() {
+                    $.ajax({
+                        url: `/chats/${chatId}/messages`,
+                        method: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            role: "assistant",
+                            content: welcomeMessage
+                        }),
+                        success: function(response) {
+                            console.log("欢迎消息保存成功", response);
+                            // 将消息添加到本地聊天记录
+                            chats[chatId].messages.push(messageObj);
+                            $(".head-chat-info").text(`共${chats[chatId].messages.length}条记录`);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("保存欢迎消息失败", status, error);
+                            retryCount++;
+                            if (retryCount < maxRetries) {
+                                console.log(`尝试第${retryCount}次重试保存欢迎消息...`);
+                                setTimeout(saveWelcomeMessage, 1000); // 1秒后重试
+                            } else {
+                                // 即使保存失败，也将消息添加到本地聊天记录
+                                console.warn("保存欢迎消息到服务器失败，但已添加到本地记录");
+                                chats[chatId].messages.push(messageObj);
+                                $(".head-chat-info").text(`共${chats[chatId].messages.length}条记录`);
+                            }
+                        }
+                    });
+                }
+                
+                saveWelcomeMessage();
+                
                 // 重新加载聊天列表
                 loadChats();
             }
